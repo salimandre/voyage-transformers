@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Entrypoint: finetune DistilBERT on vp_corpus for source_type classification."""
+"""Entrypoint: finetune DistilBERT on the travel corpus for source_type classification."""
 
 import argparse
 from pathlib import Path
@@ -11,17 +11,17 @@ from src.model import train
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Finetune DistilBERT on vp_corpus (source_type classification)")
+    parser = argparse.ArgumentParser(description="Finetune DistilBERT on the travel corpus (source_type classification)")
     parser.add_argument(
         "--data_path",
         type=str,
         default="data/vp_corpus_en_sample.json",
-        help="Path to vp_corpus JSON",
+        help="Path to corpus JSON",
     )
     parser.add_argument(
         "--output_dir",
         type=str,
-        default="runs/distilbert-vp",
+        default="runs/distilbert",
         help="Directory for checkpoints and final model",
     )
     parser.add_argument("--max_length", type=int, default=256, help="Max token length")

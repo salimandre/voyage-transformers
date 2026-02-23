@@ -1,6 +1,6 @@
 # voyage-transformers
 
-Finetune BERT-style models (e.g. DistilBERT) on the VP corpus. First task: source_type classification from `sale_text_en`.
+Finetune BERT-style models (e.g. DistilBERT) on the travel corpus. First task: source_type classification from `sale_text_en`.
 
 ## Setup
 
@@ -25,7 +25,7 @@ python main.py
 Options:
 
 ```bash
-python main.py --data_path data/vp_corpus_en_sample.json --output_dir runs/distilbert-vp --epochs 3 --batch_size 16
+python main.py --data_path data/vp_corpus_en_sample.json --output_dir runs/distilbert --epochs 3 --batch_size 16
 ```
 
 Outputs (checkpoints and final model) are written to `--output_dir`.

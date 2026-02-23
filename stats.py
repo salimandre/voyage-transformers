@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Print statistics for the VP corpus JSON."""
+"""Print statistics for the travel corpus JSON."""
 
 import argparse
 from collections import Counter
@@ -13,7 +13,7 @@ def main():
         "--data_path",
         type=str,
         default="data/vp_corpus_en_sample.json",
-        help="Path to vp_corpus JSON",
+        help="Path to corpus JSON",
     )
     args = parser.parse_args()
 

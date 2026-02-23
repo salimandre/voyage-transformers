@@ -1,4 +1,4 @@
-"""Load and preprocess vp_corpus JSON for sequence classification."""
+"""Load and preprocess travel corpus JSON for sequence classification."""
 
 import json
 from pathlib import Path
