@@ -1,4 +1,4 @@
-"""Load and preprocess travel corpus JSON for sequence classification."""
+"""Load and preprocess travel corpus JSON for language model finetuning."""
 
 import json
 from pathlib import Path
@@ -8,18 +8,10 @@ from transformers import AutoTokenizer
 
 
 def load_corpus(data_path: str) -> list[dict]:
-    """Load JSON corpus from path. Expects list of dicts with sale_text_en and source_type."""
+    """Load JSON corpus from path. Expects list of dicts with sale_text_en (sale_uid and source_type are ids)."""
     path = Path(data_path)
     with path.open(encoding="utf-8") as f:
         return json.load(f)
-
-
-def build_label_mapping(records: list[dict]) -> tuple[dict[str, int], dict[int, str]]:
-    """Build label2id and id2label from unique source_type values (sorted for stability)."""
-    labels = sorted({r["source_type"] for r in records})
-    label2id = {label: i for i, label in enumerate(labels)}
-    id2label = {i: label for label, i in label2id.items()}
-    return label2id, id2label
 
 
 def load_and_process(
@@ -30,18 +22,13 @@ def load_and_process(
     seed: int = 42,
 ):
     """
-    Load JSON, build datasets, and tokenize for sequence classification.
+    Load JSON corpus (text only), tokenize for language model finetuning.
 
     Returns:
-        train_dataset, eval_dataset, label2id, id2label, num_labels
+        train_dataset, eval_dataset
     """
     records = load_corpus(data_path)
-    label2id, id2label = build_label_mapping(records)
-
-    rows = [
-        {"text": r["sale_text_en"].strip(), "label": label2id[r["source_type"]]}
-        for r in records
-    ]
+    rows = [{"text": r["sale_text_en"].strip()} for r in records]
     full = Dataset.from_list(rows)
     split = full.train_test_split(test_size=val_ratio, seed=seed)
     train_dataset = split["train"]
@@ -52,7 +39,7 @@ def load_and_process(
             examples["text"],
             truncation=True,
             max_length=max_length,
-            padding="max_length",
+            padding=False,
         )
 
     train_dataset = train_dataset.map(
@@ -67,6 +54,4 @@ def load_and_process(
     )
     train_dataset.set_format("torch")
     eval_dataset.set_format("torch")
-
-    num_labels = len(label2id)
-    return train_dataset, eval_dataset, label2id, id2label, num_labels
+    return train_dataset, eval_dataset

@@ -32,7 +32,7 @@ def main():
     val_ratio = args.val_ratio if args.val_ratio > 0 else 1e-6
 
     tokenizer = AutoTokenizer.from_pretrained(args.tokenizer)
-    train_dataset, eval_dataset, _, _, _ = load_and_process(
+    train_dataset, eval_dataset = load_and_process(
         args.data_path,
         tokenizer,
         max_length=args.max_length,

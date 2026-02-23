@@ -1,8 +1,9 @@
-"""DistilBERT sequence classification model and training."""
+"""DistilBERT masked language model finetuning."""
 
 from transformers import (
-    AutoModelForSequenceClassification,
+    AutoModelForMaskedLM,
     AutoTokenizer,
+    DataCollatorForLanguageModeling,
     Trainer,
     TrainingArguments,
 )
@@ -11,36 +12,35 @@ from transformers import (
 DEFAULT_MODEL_NAME = "distilbert-base-uncased"
 
 
-def get_model_and_tokenizer(model_name: str, num_labels: int, id2label: dict[int, str]):
-    """Load tokenizer and sequence classification model."""
+def get_model_and_tokenizer(model_name: str):
+    """Load tokenizer and masked LM model."""
     tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForSequenceClassification.from_pretrained(
-        model_name,
-        num_labels=num_labels,
-        id2label=id2label,
-    )
+    model = AutoModelForMaskedLM.from_pretrained(model_name)
     return model, tokenizer
 
 
 def train(
     train_dataset,
     eval_dataset,
-    label2id: dict,
-    id2label: dict,
+    tokenizer,
     output_dir: str,
     model_name: str = DEFAULT_MODEL_NAME,
     num_epochs: int = 3,
     batch_size: int = 16,
-    learning_rate: float = 2e-5,
+    learning_rate: float = 5e-5,
     **training_kwargs,
 ):
     """
-    Train DistilBERT for sequence classification with Hugging Face Trainer.
+    Finetune DistilBERT as a masked language model on the corpus.
 
     Saves checkpoints and final model to output_dir.
     """
-    num_labels = len(label2id)
-    model, tokenizer = get_model_and_tokenizer(model_name, num_labels, id2label)
+    model, _ = get_model_and_tokenizer(model_name)
+    data_collator = DataCollatorForLanguageModeling(
+        tokenizer=tokenizer,
+        mlm=True,
+        mlm_probability=0.15,
+    )
 
     args = TrainingArguments(
         output_dir=output_dir,
@@ -60,6 +60,7 @@ def train(
         args=args,
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
+        data_collator=data_collator,
     )
     trainer.train()
     trainer.save_model(output_dir)

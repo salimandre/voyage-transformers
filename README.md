@@ -1,6 +1,6 @@
 # voyage-transformers
 
-Finetune BERT-style models (e.g. DistilBERT) on the travel corpus. First task: source_type classification from `sale_text_en`.
+Finetune BERT-style models (e.g. DistilBERT) on the travel corpus as a language model (masked LM). Corpus fields `sale_uid` and `source_type` are used only as identifiers; training uses the text (`sale_text_en`).
 
 ## Setup
 

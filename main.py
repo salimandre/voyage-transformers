@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Entrypoint: finetune DistilBERT on the travel corpus for source_type classification."""
+"""Entrypoint: finetune DistilBERT as a language model on the travel corpus."""
 
 import argparse
 from pathlib import Path
@@ -11,7 +11,7 @@ from src.model import train
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Finetune DistilBERT on the travel corpus (source_type classification)")
+    parser = argparse.ArgumentParser(description="Finetune DistilBERT on the travel corpus (masked LM)")
     parser.add_argument(
         "--data_path",
         type=str,
@@ -32,7 +32,7 @@ def main():
     args = parser.parse_args()
 
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
-    train_dataset, eval_dataset, label2id, id2label, num_labels = load_and_process(
+    train_dataset, eval_dataset = load_and_process(
         args.data_path,
         tokenizer,
         max_length=args.max_length,
@@ -44,8 +44,7 @@ def main():
     train(
         train_dataset,
         eval_dataset,
-        label2id=label2id,
-        id2label=id2label,
+        tokenizer=tokenizer,
         output_dir=args.output_dir,
         num_epochs=args.epochs,
         batch_size=args.batch_size,
