@@ -60,7 +60,8 @@ def main():
     for m in full["attention_mask"]:
         s = sum(m)
         lengths_tokens.append(int(s) if not hasattr(s, "item") else s.item())
-    print(f"\nText length (tokens, {args.tokenizer}): min={min(lengths_tokens)}, max={max(lengths_tokens)}, mean={sum(lengths_tokens)/n:.0f}")
+    total_tokens = sum(lengths_tokens)
+    print(f"\nText length (tokens, {args.tokenizer}): total={total_tokens}, min={min(lengths_tokens)}, max={max(lengths_tokens)}, mean={total_tokens/n:.0f}")
 
 
 if __name__ == "__main__":
