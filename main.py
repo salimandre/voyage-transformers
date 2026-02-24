@@ -29,6 +29,12 @@ def main():
     parser.add_argument("--batch_size", type=int, default=16, help="Per-device batch size")
     parser.add_argument("--val_ratio", type=float, default=0.1, help="Validation split ratio")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for split")
+    parser.add_argument(
+        "--num_trainable_layers",
+        type=int,
+        default=None,
+        help="If set, freeze first layers and train only last N transformer layers plus MLM head",
+    )
     args = parser.parse_args()
 
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
@@ -48,6 +54,7 @@ def main():
         output_dir=args.output_dir,
         num_epochs=args.epochs,
         batch_size=args.batch_size,
+        num_trainable_layers=args.num_trainable_layers,
     )
     print(f"Model saved to {args.output_dir}")
 

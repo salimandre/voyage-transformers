@@ -35,4 +35,6 @@ Options:
 python main.py --data_path data/vp_corpus_en_sample.json --output_dir runs/distilbert --epochs 3 --batch_size 16
 ```
 
+To train only the last 2 transformer layers (freeze the rest): `--num_trainable_layers 2`.
+
 Outputs (checkpoints and final model) are written to `--output_dir`.

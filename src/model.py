@@ -1,5 +1,7 @@
 """DistilBERT masked language model finetuning."""
 
+from __future__ import annotations
+
 from transformers import (
     AutoModelForMaskedLM,
     AutoTokenizer,
@@ -19,6 +21,28 @@ def get_model_and_tokenizer(model_name: str):
     return model, tokenizer
 
 
+def _freeze_first_layers_train_last(
+    model,
+    num_trainable_layers: int | None,
+):
+    """Freeze all parameters, then unfreeze last N transformer layers and MLM head (DistilBERT)."""
+    if num_trainable_layers is None:
+        return
+    num_hidden_layers = model.config.num_hidden_layers
+    n = min(num_trainable_layers, num_hidden_layers)
+    for p in model.parameters():
+        p.requires_grad = False
+    transformer_layers = model.distilbert.transformer.layer
+    for i in range(num_hidden_layers - n, num_hidden_layers):
+        for p in transformer_layers[i].parameters():
+            p.requires_grad = True
+    for mod_name in ("vocab_transform", "vocab_layer_norm", "vocab_projector"):
+        m = getattr(model, mod_name, None)
+        if m is not None:
+            for p in m.parameters():
+                p.requires_grad = True
+
+
 def train(
     train_dataset,
     eval_dataset,
@@ -28,6 +52,7 @@ def train(
     num_epochs: int = 3,
     batch_size: int = 16,
     learning_rate: float = 5e-5,
+    num_trainable_layers: int | None = None,
     **training_kwargs,
 ):
     """
@@ -36,6 +61,10 @@ def train(
     Saves checkpoints and final model to output_dir.
     """
     model, _ = get_model_and_tokenizer(model_name)
+    _freeze_first_layers_train_last(model, num_trainable_layers)
+    if num_trainable_layers is not None:
+        n_trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
+        print(f"Trainable parameters: {n_trainable:,}")
     data_collator = DataCollatorForLanguageModeling(
         tokenizer=tokenizer,
         mlm=True,
