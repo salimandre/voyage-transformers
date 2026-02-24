@@ -10,6 +10,13 @@ pip install -r requirements.txt
 
 ## Run
 
+**Model info** (config, layers, parameter counts):
+
+```bash
+python model_info.py
+python model_info.py --model distilbert-base-uncased --verbose
+```
+
 **Corpus statistics** (optional):
 
 ```bash
